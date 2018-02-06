@@ -37,43 +37,41 @@ Althouh a good first start, this regression ignores any of the by-week adjustmen
 Suppose we want to see what the effect of a fare reduction is one week after a cut and whether it is diferent from the "long run" effect.
 We want to run a regression of the form 
 ```
-y ~ price +  I(price - lag(price,1)):t1
+y ~ price + I(price - price.lag.1):t1"
 ```
-where the `lag` operator gets the price one time period back and `t1` is in indicator that the observation is occurring one period after 
-the change. The `I(price - lag(price,1))` term is the size of the change. 
+where the `price.lag.1` is the price one time period back and `t1` is in indicator that the observation is occurring one period after the change. The `I(price - price.lage.1)` term is the size of the change. 
 To compute the by-week effects, we can add the coefficient on `price` to the coefficient on the "difference" term. 
 We might also want to examine the pre-period,  
 ```
-~ price + I(lead(price,1) -price):tn1 + I(price - lag(price,1)):t1"
+y ~ price + I(price.lead.1-price):tn1 + I(price - price.lag.1):t1"
+
 ```
-where `tn1` is an indicator that the obesrvtion is occurring one period before the change. 
+where `tn1` is an indicator that the obeservation is occurring one period before the change. 
 For large numbers of leads and lags, this can get tedious, and so the `rAutor` package offers `GenFormula`. 
 For the second example, we can simple use 
 ```
 > GenFormula("price", num.periods.pre = 1, num.periods.post = 1)
-[1] "~ price + I(lead(price,1) -price):tn1 + I(price - lag(price,1)):t1"
-> 
+[1] "~ price + I(price.lead.1-price):tn1 + I(price - price.lag.1):t1"
+>
 ```
 ## Generating indicators 
 
 To generate the indicators, we can simply use the `rAutor` AddIndicators function (here shown with 2 leads and 2 lags) around the city A fare change:  
 ```
-> AddIndicators(df, 2, 2, "price", "city", 0.01)
-# A tibble: 12 x 7
-   city   week price    t1    t2   tn2   tn1
-   <fct> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
- 1 A      1.00  1.00  0     0     0     0   
- 2 A      2.00  1.00  0     0     1.00  0   
- 3 A      3.00  1.00  0     0     0     1.00
- 4 A      4.00  0     1.00  0     0     0   
- 5 A      5.00  0     0     1.00  0     0   
- 6 A      6.00  0     0     0     0     0   
- 7 B      1.00  2.00  0     0     0     0   
- 8 B      2.00  2.00  0     0     0     0   
- 9 B      3.00  2.00  0     0     0     0   
-10 B      4.00  2.00  0     0     0     0   
-11 B      5.00  2.00  0     0     0     0   
-12 B      6.00  2.00  0     0     0     0   
+   city   week price      y    t1 price.lag.1    t2 price.lag.2   tn2 price.lead.2   tn1 price.lead.1
+   <fct> <dbl> <dbl>  <dbl> <dbl>       <dbl> <dbl>       <dbl> <dbl>        <dbl> <dbl>        <dbl>
+ 1 A      1.00  1.00 -0.463  0          NA     0          NA     0            1.00  0            1.00
+ 2 A      2.00  1.00 -0.204  0           1.00  0          NA     1.00         0     0            1.00
+ 3 A      3.00  1.00 -0.557  0           1.00  0           1.00  0            0     1.00         0   
+ 4 A      4.00  0     0.608  1.00        1.00  0           1.00  0            0     0            0   
+ 5 A      5.00  0     0.392  0           0     1.00        1.00  0           NA     0            0   
+ 6 A      6.00  0     0.163  0           0     0           0     0           NA     0           NA   
+ 7 B      1.00  2.00 -1.43   0          NA     0          NA     0            2.00  0            2.00
+ 8 B      2.00  2.00 -1.05   0           2.00  0          NA     0            2.00  0            2.00
+ 9 B      3.00  2.00 -1.75   0           2.00  0           2.00  0            2.00  0            2.00
+10 B      4.00  2.00 -1.03   0           2.00  0           2.00  0            2.00  0            2.00
+11 B      5.00  2.00 -1.83   0           2.00  0           2.00  0           NA     0            2.00
+12 B      6.00  2.00 -1.40   0           2.00  0           2.00  0           NA     0           NA     
 ```
 
 You can now use this formula generated above with this data frame. 
