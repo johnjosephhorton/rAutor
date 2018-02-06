@@ -1,0 +1,11 @@
+Package: rAutor
+Type: Package
+Title: Creates Lead/Lag Structures for DiD Panel Regressions
+Version: 0.1.0
+Author: John Horton
+Maintainer: John Horton <john.joseph.horton@gmail.com>
+Description: For some kinds of difference-in-differences analysis, the "treatment" is complex and this package helps.
+License: MIT License
+Encoding: UTF-8
+LazyData: true
+Suggests: testthat
