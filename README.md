@@ -54,9 +54,10 @@ For the second example, we can simple use
 [1] "~ price + I(price.lead.1-price):tn1 + I(price - price.lag.1):t1"
 >
 ```
-We can also avoid doing the lead/lag calculation in the fomrmula by using the `delta.version` flag
-```
-
+We can also avoid doing the lead/lag calculation in the fomrmula by using the `delta.version` flag.
+ ```
+> GenFormula("price", 1,1, delta.version = TRUE)
+[1] "~ price + price.lead.delta.1:tn1 + price.lag.delta.1:t1"
 ```
 
 
@@ -79,8 +80,7 @@ To generate the indicators, we can simply use the `rAutor` AddIndicators functio
 11 B      5.00  2.00 -1.83   0           2.00  0           2.00  0           NA     0            2.00
 12 B      6.00  2.00 -1.40   0           2.00  0           2.00  0           NA     0           NA     
 ```
-
-You can now use this formula generated above with this data frame. 
+Note that lags and leads that overrun the grouping are NA and if these are interacted with the time indicator, this term will also be NA and the observation will be dropped. In case we want to still use these observations in the regression, `AddIndicators` also adds variables for the difference directly, with missing `NA` values for the difference with 0. To use this feature, pass `delta.version = TRUE` to `GenFormula`. 
 
 ## Extracting coefficients 
 
@@ -113,7 +113,14 @@ df.effects <- ExtractCoef(m, 2, 2, felm.model = T)
 
 We can then plot the effects
 ```
-
+g <- ggplot(data = df.effects, aes(x = t, y = effect)) + geom_point() +
+  geom_errorbar(aes(ymin = effect - 2*se, ymax = effect + 2*se)) +
+  geom_point() +
+  geom_hline(yintercept = 0, colour = "red", linetype="dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  theme_bw()
+print(g)
 ```
+As expected, the estimated treatment effect is close to -1: 
 ![Exampe](example.png)
 
