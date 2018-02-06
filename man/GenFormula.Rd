@@ -4,7 +4,7 @@
 \alias{GenFormula}
 \title{Generates a formula for use in dynamic model}
 \usage{
-GenFormula(x, num.periods.pre, num.periods.post)
+GenFormula(x, num.periods.pre, num.periods.post, delta.version = FALSE)
 }
 \arguments{
 \item{x}{regressor of interst}
@@ -12,6 +12,8 @@ GenFormula(x, num.periods.pre, num.periods.post)
 \item{num.periods.pre}{number of pre-periods}
 
 \item{num.periods.post}{number of post periods}
+
+\item{delta.version}{Use deltas rater than explict differences}
 }
 \value{
 a string that can be used as a formula

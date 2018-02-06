@@ -25,6 +25,9 @@ AddIndicators  <- function(df, num.periods.post, num.periods.pre, independent.va
       df[[paste0("t",i)]] = with(df, hc * cp)
       df %<>% group_by(grouping.variable) %>%
         mutate(lag.term = dplyr::lag(independent.variable,i))
+      df %<>% mutate(delta.lag = independent.variable - lag.term)
+      df[[paste0(independent.variable, ".lag.delta.", i)]] = ifelse(is.na(df$delta.lag), 0,
+                                                                    df$delta.lag)
       df[[paste0(independent.variable,".lag.",i)]] = df$lag.term
     }
 
@@ -35,6 +38,11 @@ AddIndicators  <- function(df, num.periods.post, num.periods.pre, independent.va
       df %<>% group_by(grouping.variable) %>%
         mutate(lead.term = dplyr::lead(independent.variable,abs(i)))
       df[[paste0(independent.variable, ".lead.",abs(i))]] = df$lead.term
+
+      df %<>% mutate(delta.lead = lead.term - independent.variable)
+      df[[paste0(independent.variable, ".lead.delta.", abs(i))]] = ifelse(is.na(df$delta.lead), 0,
+                                                                    df$delta.lead)
+
     }
     df %>% ungroup %>% select(-hc, -cp, -grouping.variable, -independent.variable, -lag.term, -lead.term)
 }

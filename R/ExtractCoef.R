@@ -1,19 +1,20 @@
-#' Extracts coefficients from a model 
+#' Extracts coefficients from a model
 #'
-#' @param model 
-#' @param number of periods pre 
-#' @param number of periods post
-#' @param felm.model 
-#' @return data frame 
+#' @param m  model
+#' @param num.periods.pre how many pre-period indicators are used
+#' @param num.periods.post how many post-period indicators are used
+#' @param felm.model whether it is a lfe/felm model
+#' @return data frame
+#' @importFrom plm vcovHC
 #' @export
 
 ExtractCoef <- function(m, num.periods.pre, num.periods.post, felm.model = FALSE){
     max.length <- (num.periods.pre + num.periods.post + 1)
     betas <- coef(m)[1:max.length]
     if (felm.model){
-        ses <- sqrt(diag(vcov(m)))[1:max.length]        
+        ses <- sqrt(diag(vcov(m)))[1:max.length]
     } else {
-        ses <- sqrt(diag(vcovHC(m,type="HC0",cluster="group")))[1:max.length]
+        ses <- sqrt(diag(plm::vcovHC(m,type="HC0",cluster="group")))[1:max.length]
     }
     num.coef <- length(betas)
     lr <- betas[1]
@@ -27,5 +28,7 @@ ExtractCoef <- function(m, num.periods.pre, num.periods.post, felm.model = FALSE
     new.beta <- c(leads, lags + lr, lr)
     new.ses <-  c(se.leads, sqrt(se.lags^2 + se.lr^2), se.lr)
     t <- c(-num.periods.pre:-1, 1:(num.periods.post + 1))
-    data.frame(t, effect = new.beta, se = new.ses)
+    df.effects <- data.frame(t, effect = new.beta, se = new.ses)
+    rownames(df.effects) <- df.effects$t
+    df.effects
 }

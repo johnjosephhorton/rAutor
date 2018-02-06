@@ -7,13 +7,13 @@
 ExtractCoef(m, num.periods.pre, num.periods.post, felm.model = FALSE)
 }
 \arguments{
-\item{felm.model}{}
+\item{m}{model}
 
-\item{model}{}
+\item{num.periods.pre}{how many pre-period indicators are used}
 
-\item{number}{of periods pre}
+\item{num.periods.post}{how many post-period indicators are used}
 
-\item{number}{of periods post}
+\item{felm.model}{whether it is a lfe/felm model}
 }
 \value{
 data frame
