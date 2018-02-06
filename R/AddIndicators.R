@@ -23,16 +23,20 @@ AddIndicators  <- function(df, num.periods.post, num.periods.pre, independent.va
       df %<>% group_by(grouping.variable) %>% mutate(hc = HasChange(independent.variable, i, epsilon))
       df %<>% group_by(grouping.variable) %>% mutate(cp = CherryPickedOK(independent.variable, i, epsilon))
       df[[paste0("t",i)]] = with(df, hc * cp)
-      #df %<>% group_by(grouping.variable) %>% mutate(lag.term = lag(independent.variable,i))
-      #df[[paste0("lag.",i)]] = df$lag.term
+      df %<>% group_by(grouping.variable) %>%
+        mutate(lag.term = dplyr::lag(independent.variable,i))
+      df[[paste0(independent.variable,".lag.",i)]] = df$lag.term
     }
 
     for(i in -num.periods.pre:-1){
       df %<>% group_by(grouping.variable) %>% mutate(hc = HasChange(independent.variable, i, epsilon))
       df %<>% group_by(grouping.variable) %>% mutate(cp = CherryPickedOK(independent.variable, i, epsilon))
       df[[paste0("tn",abs(i))]] = with(df, hc * cp)
+      df %<>% group_by(grouping.variable) %>%
+        mutate(lead.term = dplyr::lead(independent.variable,abs(i)))
+      df[[paste0(independent.variable, ".lead.",abs(i))]] = df$lead.term
     }
-    df %>% ungroup %>% select(-hc, -cp, -grouping.variable, -independent.variable)
+    df %>% ungroup %>% select(-hc, -cp, -grouping.variable, -independent.variable, -lag.term, -lead.term)
 }
 
 

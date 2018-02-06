@@ -8,11 +8,11 @@
 
 GenFormula <- function(x, num.periods.pre, num.periods.post){
     LagTerm <- function(var.name, i){
-      paste0("I(", var.name, " - lag(", var.name, ",", i, ")):t", i)
+      paste0("I(", var.name, " - ", var.name, ".lag.", i, "):t", i)
     }
 
     LeadTerm <- function(var.name, i){
-      paste0("I(lead(", var.name, ",", i, ") -", var.name, "):tn", i)
+      paste0("I(",var.name, ".lead.", i, "-", var.name, "):tn", i)
     }
 
     if (num.periods.pre < 1){
