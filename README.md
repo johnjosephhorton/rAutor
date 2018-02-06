@@ -54,6 +54,12 @@ For the second example, we can simple use
 [1] "~ price + I(price.lead.1-price):tn1 + I(price - price.lag.1):t1"
 >
 ```
+We can also avoid doing the lead/lag calculation in the fomrmula by using the `delta.version` flag
+```
+
+```
+
+
 ## Generating indicators 
 
 To generate the indicators, we can simply use the `rAutor` AddIndicators function (here shown with 2 leads and 2 lags) around the city A fare change:  
@@ -77,3 +83,37 @@ To generate the indicators, we can simply use the `rAutor` AddIndicators functio
 You can now use this formula generated above with this data frame. 
 
 ## Extracting coefficients 
+
+Typically, we want to plot the estimated per-period effects around the change. 
+The regression coefficients we obtain from the fitted model do not directly correspond to what we are lookging for---in a nutshell, each per-period indicator coefficient is the difference from whatever the long-run effect is in that period. 
+To extract the coefficeints, you can use the the `ExtractCoef` function. Note that this function expects the model to be fit with felm or plm and so there is no intercept term in `coef(m)`.  
+It is probably easiest to just see how it works by example. 
+First, I construct the data set and create an outcome, `y` which is a unform random minus the price. 
+
+```
+set.seed(1234)
+df <- data.frame(
+  city = c("A", "A", "A", "A", "A", "A", "B", "B", "B", "B", "B", "B"),
+  week  =   c(1,     2,   3,   4,  5,   6,   1,   2,   3,   4,   5,   6),
+  price  =   c(1,     1,   1,   0,  0,   0,   2,   2,   2,   2,   2,   2)
+)
+df$y <- runif(nrow(df)) - df$price
+```
+Next, we add indicators for 2 leads and 2 lags and construct the formula, with a city-specific fixed effects:
+```
+df <- AddIndicators(df, 2,2,"price", "city")
+formula <- as.formula(paste0("y", GenFormula("price", 2,2, delta.version = TRUE),
+           "|city|0|0"))
+ ```
+Then we estimate the model using `lfe` package and extract the coefficients: 
+```
+m <- lfe::felm(formula, data = df)
+df.effects <- ExtractCoef(m, 2, 2, felm.model = T)
+```
+
+We can then plot the effects
+```
+
+```
+![Exampe](example.png)
+
