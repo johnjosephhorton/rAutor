@@ -31,7 +31,7 @@ We could estimate the effect of the price change on some outcome `y` with a regr
 ```
 y ~ price + factor(city) + factor(week)
 ```
-Althouh a good first start, this regression ignores any of the by-week adjustments and does not allow us to look for parallel trends. 
+Although a good first start, this regression ignores any of the by-week adjustments and does not allow us to look for parallel trends. 
 
 ## Generating lead/lead formulas 
 Suppose we want to see what the effect of a fare reduction is one week after a cut and whether it is diferent from the "long run" effect.
@@ -54,7 +54,7 @@ For the second example, we can simple use
 [1] "~ price + I(price.lead.1-price):tn1 + I(price - price.lag.1):t1"
 >
 ```
-We can also avoid doing the lead/lag calculation in the fomrmula by using the `delta.version` flag.
+We can also avoid doing the lead/lag calculation in the formula by using the `delta.version` flag.
  ```
 > GenFormula("price", 1,1, delta.version = TRUE)
 [1] "~ price + price.lead.delta.1:tn1 + price.lag.delta.1:t1"
@@ -88,7 +88,7 @@ Typically, we want to plot the estimated per-period effects around the change.
 The regression coefficients we obtain from the fitted model do not directly correspond to what we are lookging for---in a nutshell, each per-period indicator coefficient is the difference from whatever the long-run effect is in that period. 
 To extract the coefficeints, you can use the the `ExtractCoef` function. Note that this function expects the model to be fit with felm or plm and so there is no intercept term in `coef(m)`.  
 It is probably easiest to just see how it works by example. 
-First, I construct the data set and create an outcome, `y` which is a unform random minus the price. 
+First, I construct the data set and create an outcome, `y` which is a uniform random minus the price. 
 
 ```
 set.seed(1234)
