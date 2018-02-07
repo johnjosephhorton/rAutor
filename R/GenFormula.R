@@ -3,17 +3,26 @@
 #' @param x regressor of interst
 #' @param num.periods.pre number of pre-periods
 #' @param num.periods.post number of post periods
+#' @param delta.version Use deltas rater than explict differences
 #' @return a string that can be used as a formula
 #' @export
 
-GenFormula <- function(x, num.periods.pre, num.periods.post){
+GenFormula <- function(x, num.periods.pre, num.periods.post, delta.version = FALSE){
     LagTerm <- function(var.name, i){
-      paste0("I(", var.name, " - ", var.name, ".lag.", i, "):t", i)
-    }
+       if (delta.version){
+        paste0(var.name, ".lag.delta.", i, ":t", i)
+      } else {
+        paste0("I(", var.name, " - ", var.name, ".lag.", i, "):t", i)
+      }
+     }
 
     LeadTerm <- function(var.name, i){
-      paste0("I(",var.name, ".lead.", i, "-", var.name, "):tn", i)
-    }
+      if (delta.version){
+        paste0(var.name, ".lead.delta.", i, ":tn", i)
+      } else {
+        paste0("I(",var.name, ".lead.", i, "-", var.name, "):tn", i)
+      }
+      }
 
     if (num.periods.pre < 1){
         lead.terms <- ""
